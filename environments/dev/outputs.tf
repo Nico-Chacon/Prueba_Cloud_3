@@ -33,12 +33,12 @@ output "cloudtrail_trail_name" {
   value       = module.cloudtrail.trail_name
 }
 
-output "auditor_role_arn" {
-  description = "ARN del rol IAM de auditor"
-  value       = module.governance.auditor_role_arn
-}
+#output "auditor_role_arn" {
+#  description = "ARN del rol IAM de auditor"
+#  value       = module.governance.auditor_role_arn
+#}
 
-output "budget_monthly_name" {
-  description = "Nombre del presupuesto mensual configurado"
-  value       = module.budgets.budget_monthly_name
-}
+#output "budget_monthly_name" {
+#  description = "Nombre del presupuesto mensual configurado"
+#  value       = module.budgets.budget_monthly_name
+#}

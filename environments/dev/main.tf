@@ -89,14 +89,14 @@ module "monitoring" {
 # MÓDULO: AWS Budgets — Control financiero con alertas SNS
 # EP3 NUEVO: presupuestos con umbrales 60/70/80/100%
 # ----------------------------------------------------------
-module "budgets" {
-  source             = "../../modules/budgets"
-  project_name       = var.project_name
-  monthly_budget_usd = var.monthly_budget_usd
-  ec2_budget_usd     = var.ec2_budget_usd
-  rds_budget_usd     = var.rds_budget_usd
-  sns_topic_arn      = module.monitoring.sns_topic_arn
-}
+# module "budgets" {
+#  source             = "../../modules/budgets"
+#  project_name       = var.project_name
+#  monthly_budget_usd = var.monthly_budget_usd
+#  ec2_budget_usd     = var.ec2_budget_usd
+#  rds_budget_usd     = var.rds_budget_usd
+#  sns_topic_arn      = module.monitoring.sns_topic_arn
+#}
 
 # ----------------------------------------------------------
 # MÓDULO: CloudTrail — Auditoría y trazabilidad
@@ -113,11 +113,11 @@ module "cloudtrail" {
 # MÓDULO: Governance — IAM roles y política de tagging
 # EP3 NUEVO: roles de auditor y política de tags obligatorios
 # ----------------------------------------------------------
-module "governance" {
-  source       = "../../modules/governance"
-  project_name = var.project_name
-  common_tags  = local.common_tags
-}
+# module "governance" {
+#  source       = "../../modules/governance"
+#  project_name = var.project_name
+#  common_tags  = local.common_tags
+#}
 
 # Backup module disabled - AWS Academy no soporta IAM roles para Backup
 # module "backup" {
