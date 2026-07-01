@@ -38,8 +38,9 @@ jobs:
         run: terraform init
 
       - name: Terraform Format
-        working-directory: ./environments/dev
         run: terraform fmt -recursive
+        working-directory: ./environments/dev
+        
 
       - name: Terraform Validate
         working-directory: ./environments/dev
