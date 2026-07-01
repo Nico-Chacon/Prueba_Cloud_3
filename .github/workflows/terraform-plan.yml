@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE20: true
   TF_VAR_email_sns: ${{ secrets.EMAIL_SNS }}
 
 jobs:
