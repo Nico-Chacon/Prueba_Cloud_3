@@ -1,55 +1,61 @@
-name: "Terraform Apply"
+- name: Print runner & terraform info
+  working-directory: ./environments/dev
+  run: |
+    terraform version
+    echo "Workspace: $(terraform workspace show || echo default)"
 
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - '**/*.tf'
-      - '**/*.tfvars'
-      - '**/.terraform.lock.hcl'
-  workflow_dispatch:
+- name: Terraform Init
+  working-directory: ./environments/dev
+  env:
+    TF_IN_AUTOMATION: "1"
+    TF_LOG: "TRACE"
+    TF_LOG_PATH: tf.log
+  run: |
+    set -o pipefail
+    terraform init -input=false -no-color -upgrade
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE20: true
-  TF_VAR_email_sns: ${{ secrets.EMAIL_SNS }}
+- name: Terraform Validate
+  working-directory: ./environments/dev
+  env:
+    TF_IN_AUTOMATION: "1"
+    TF_LOG: "TRACE"
+    TF_LOG_PATH: tf.log
+  run: |
+    terraform validate -no-color -var-file=terraform.tfvars
 
-jobs:
-  apply:
-    name: "Terraform Apply"
-    runs-on: ubuntu-latest
+- name: Terraform Format (auto-fix)
+  working-directory: ./environments/dev
+  run: |
+    terraform fmt -recursive
+    if [ -n "$(git status --porcelain)" ]; then
+      git config user.name "github-actions[bot]"
+      git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      git add -A
+      git commit -m "chore: format Terraform files (action)"
+      git push
+    fi
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+- name: Terraform Plan
+  working-directory: ./environments/dev
+  env:
+    TF_IN_AUTOMATION: "1"
+    TF_LOG: "TRACE"
+    TF_LOG_PATH: tf.log
+  run: |
+    set -o pipefail
+    terraform plan -input=false -no-color -var-file=terraform.tfvars -out=tfplan || (echo "PLAN FAILED — imprimiendo tf.log" && sed -n '1,400p' tf.log && exit 1)
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+- name: Upload Terraform debug log
+  if: always()
+  uses: actions/upload-artifact@v4
+  with:
+    persist-credentials: true
+    name: terraform-debug-log
+    path: ./environments/dev/tf.log
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region: us-east-1
-
-      - name: Terraform Init
-        working-directory: ./environments/dev
-        run: terraform init
-
-      - name: Terraform Validate
-        working-directory: ./environments/dev
-        run: terraform validate
-
-      - name: Terraform Format
-        working-directory: ./environments/dev
-        run: terraform fmt -check -recursive
-
-      - name: Terraform Plan
-        working-directory: ./environments/dev
-        run: terraform plan -out=tfplan
-
-      - name: Terraform Apply
-        working-directory: ./environments/dev
-        run: terraform apply -auto-approve tfplan
+- name: Terraform Apply
+  if: success()
+  working-directory: ./environments/dev
+  env:
+    TF_IN_AUTOMATION: "1"
+  run: terraform apply -auto-approve tfplan

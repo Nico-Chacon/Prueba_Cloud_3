@@ -17,6 +17,6 @@ app_version = "v1.0.0"
 # ----------------------------------------------------------
 # EP3: Presupuestos mensuales en USD
 # ----------------------------------------------------------
-monthly_budget_usd = "100"   # Presupuesto total de la cuenta
-ec2_budget_usd     = "40"    # Solo instancias EC2
-rds_budget_usd     = "30"    # Solo base de datos RDS
+monthly_budget_usd = "100" # Presupuesto total de la cuenta
+ec2_budget_usd     = "40"  # Solo instancias EC2
+rds_budget_usd     = "30"  # Solo base de datos RDS
